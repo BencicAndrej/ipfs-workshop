@@ -22,7 +22,15 @@ async function createIPFSNode(node) {
 
     let obj = await ipfs.object.new();
 
-    //@TODO: Add links to IPFS object.
+    for (let link in node.links || {}) {
+        const linkNode = await createIPFSNode(node.links[link]);
+
+        obj = await ipfs.object.patch.addLink(obj.multihash, {
+            name: link,
+            size: linkNode.size,
+            multihash: linkNode.multihash,
+        });
+    }
 
     let data = JSON.stringify(node.data);
 
@@ -31,7 +39,20 @@ async function createIPFSNode(node) {
 }
 
 async function getCommand(hash, options = {}) {
-    console.log("Implement me!");
+    //@TODO: Implement get command.
+}
+
+async function getDocumentNodeByHash(hash) {
+    const ipfs = await IPFS.instance();
+
+    //@TODO: Implement node get by hash.
+
+    return parseIPFSObject(object);
+}
+
+
+function parseIPFSObject(object) {
+    //@TODO: Parse IPFS object.
 }
 
 module.exports = {
