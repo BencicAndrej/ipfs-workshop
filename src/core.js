@@ -4,11 +4,21 @@ const IPFS = require("./util/ipfs");
 const crypto = require("./util/crypto");
 
 async function putCommand(documentPath, options = {}) {
-    console.log("Implement me!");
+    const documentRoot = parseDocument(documentPath);
+
+    console.log(JSON.stringify(documentRoot));
 }
 
 function parseDocument(documentPath) {
-    //@TODO: Read file and print contents.
+    const data = fs.readFileSync(documentPath);
+
+    return JSON.parse(data);
+}
+
+async function createIPFSNode(node) {
+    const ipfs = await IPFS.instance();
+
+    //@TODO: Implement saving node to IPFS.
 }
 
 async function getCommand(hash, options = {}) {
