@@ -39,21 +39,44 @@ async function createIPFSNode(node) {
 }
 
 async function getCommand(hash, options = {}) {
-    //@TODO: Implement get command.
+    let documentNode = await getDocumentNodeByHash(hash);
+
+    if (options.expand) {
+        documentNode = await expandDocumentNodeLinks(documentNode);
+    }
+
+    console.log(JSON.stringify(documentNode));
 }
 
 async function getDocumentNodeByHash(hash) {
     const ipfs = await IPFS.instance();
 
-    //@TODO: Implement node get by hash.
+    let object = await ipfs.object.get(hash);
 
     return parseIPFSObject(object);
 }
 
 
 function parseIPFSObject(object) {
-    //@TODO: Parse IPFS object.
+    let data = object.data.toString();
+
+    data = JSON.parse(data);
+
+    return {
+        "hash": object._cid.toBaseEncodedString(),
+        "data": data,
+        "links": object.links.reduce((acc, link) => {
+            acc[link.name] = link._cid.toBaseEncodedString();
+
+            return acc
+        }, {}),
+    };
 }
+
+async function expandDocumentNodeLinks(node) {
+    //@TODO: Implement recursive link expansion.
+}
+
 
 module.exports = {
     putCommand,
