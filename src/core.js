@@ -6,7 +6,9 @@ const crypto = require("./util/crypto");
 async function putCommand(documentPath, options = {}) {
     const documentRoot = parseDocument(documentPath);
 
-    console.log(JSON.stringify(documentRoot));
+    const ipfsRoot = await createIPFSNode(documentRoot);
+
+    console.log(ipfsRoot.toJSON().multihash);
 }
 
 function parseDocument(documentPath) {
@@ -18,7 +20,14 @@ function parseDocument(documentPath) {
 async function createIPFSNode(node) {
     const ipfs = await IPFS.instance();
 
-    //@TODO: Implement saving node to IPFS.
+    let obj = await ipfs.object.new();
+
+    //@TODO: Add links to IPFS object.
+
+    let data = JSON.stringify(node.data);
+
+    return await ipfs.object.patch.setData(
+        obj.multihash, Buffer.from(data));
 }
 
 async function getCommand(hash, options = {}) {
