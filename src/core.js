@@ -8,7 +8,7 @@ async function putCommand(documentPath, options = {}) {
 
     const ipfsRoot = await createIPFSNode(documentRoot, options.password);
 
-    const documentNode = parseIPFSObject(ipfsRoot);
+    const documentNode = parseIPFSObject(ipfsRoot, options.password);
 
     console.log(JSON.stringify(documentNode));
 }
@@ -36,7 +36,7 @@ async function createIPFSNode(node, password = null) {
 
     let data = JSON.stringify(node.data);
     if (password) {
-        //@TODO: Encrypt node data on put.
+        data = crypto.encrypt(password, data);
     }
 
     return await ipfs.object.patch.setData(
@@ -47,28 +47,28 @@ async function getCommand(hash, options = {}) {
     let path;
     [hash, ...path] = hash.split("/").filter(el => el.length > 0);
 
-    let documentNode = await getDocumentNodeByHash(hash);
+    let documentNode = await getDocumentNodeByHash(hash, options.password);
 
     if (path.length > 0) {
-        documentNode = await getDocumentNodeAtPath(documentNode, path);
+        documentNode = await getDocumentNodeAtPath(documentNode, path, options.password);
     }
 
     if (options.expand) {
-        documentNode = await expandDocumentNodeLinks(documentNode);
+        documentNode = await expandDocumentNodeLinks(documentNode, options.password);
     }
 
     console.log(JSON.stringify(documentNode));
 }
 
-async function getDocumentNodeByHash(hash) {
+async function getDocumentNodeByHash(hash, password = null) {
     const ipfs = await IPFS.instance();
 
     let object = await ipfs.object.get(hash);
 
-    return parseIPFSObject(object);
+    return parseIPFSObject(object, password);
 }
 
-async function getDocumentNodeAtPath(node, path) {
+async function getDocumentNodeAtPath(node, path, password = null) {
     for (let i = 0; i < path.length; i++) {
         const linkName = path[i];
 
@@ -77,16 +77,21 @@ async function getDocumentNodeAtPath(node, path) {
             throw new Error(`link not found: ${linkName}`)
         }
 
-        node = await getDocumentNodeByHash(linkHash);
+        node = await getDocumentNodeByHash(linkHash, password);
     }
 
     return node;
 }
 
-function parseIPFSObject(object) {
+function parseIPFSObject(object, password = null) {
     let data = object.data.toString();
 
-    data = JSON.parse(data);
+    //@TODO: Implement password on get.
+
+    try {
+        data = JSON.parse(data);
+    } catch (e) {
+    }
 
     return {
         "hash": object._cid.toBaseEncodedString(),
@@ -99,13 +104,13 @@ function parseIPFSObject(object) {
     };
 }
 
-async function expandDocumentNodeLinks(node) {
+async function expandDocumentNodeLinks(node, password = null) {
     for (let linkName in node.links) {
         let linkHash = node.links[linkName];
 
-        let linkNode = await getDocumentNodeByHash(linkHash);
+        let linkNode = await getDocumentNodeByHash(linkHash, password);
 
-        let expandedLink = await expandDocumentNodeLinks(linkNode);
+        let expandedLink = await expandDocumentNodeLinks(linkNode, password);
 
         node.links[linkName] = expandedLink;
     }
