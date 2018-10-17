@@ -41,6 +41,8 @@ async function createIPFSNode(node) {
 async function getCommand(hash, options = {}) {
     let documentNode = await getDocumentNodeByHash(hash);
 
+    //@TODO: Extract hash and relative path from hash and get node at that path.
+
     if (options.expand) {
         documentNode = await expandDocumentNodeLinks(documentNode);
     }
@@ -56,6 +58,9 @@ async function getDocumentNodeByHash(hash) {
     return parseIPFSObject(object);
 }
 
+async function getDocumentNodeAtPath(node, path) {
+    //@TODO: Implement relative node paths.
+}
 
 function parseIPFSObject(object) {
     let data = object.data.toString();
@@ -74,7 +79,17 @@ function parseIPFSObject(object) {
 }
 
 async function expandDocumentNodeLinks(node) {
-    //@TODO: Implement recursive link expansion.
+    for (let linkName in node.links) {
+        let linkHash = node.links[linkName];
+
+        let linkNode = await getDocumentNodeByHash(linkHash);
+
+        let expandedLink = await expandDocumentNodeLinks(linkNode);
+
+        node.links[linkName] = expandedLink;
+    }
+
+    return node;
 }
 
 
