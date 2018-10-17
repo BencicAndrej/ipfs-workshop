@@ -25,6 +25,7 @@ async function createIPFSNode(node, password = null) {
     let obj = await ipfs.object.new();
 
     for (let link in node.links || {}) {
+        //@TODO: Implement key derivation.
         const linkNode = await createIPFSNode(node.links[link], password);
 
         obj = await ipfs.object.patch.addLink(obj.multihash, {
@@ -54,7 +55,7 @@ async function getCommand(hash, options = {}) {
     }
 
     if (options.expand) {
-        documentNode = await expandDocumentNodeLinks(documentNode, options.password);
+        documentNode = await expandDocumentNodeLinks(documentNode, documentNode.password);
     }
 
     console.log(JSON.stringify(documentNode));
@@ -77,6 +78,7 @@ async function getDocumentNodeAtPath(node, path, password = null) {
             throw new Error(`link not found: ${linkName}`)
         }
 
+        //@TODO: Implement key derivation.
         node = await getDocumentNodeByHash(linkHash, password);
     }
 
@@ -86,7 +88,12 @@ async function getDocumentNodeAtPath(node, path, password = null) {
 function parseIPFSObject(object, password = null) {
     let data = object.data.toString();
 
-    //@TODO: Implement password on get.
+    let passwordMatch = false;
+    if (password) {
+        data = crypto.decrypt(password, data);
+
+        passwordMatch = true;
+    }
 
     try {
         data = JSON.parse(data);
@@ -96,6 +103,7 @@ function parseIPFSObject(object, password = null) {
     return {
         "hash": object._cid.toBaseEncodedString(),
         "data": data,
+        "password": passwordMatch ? password : null,
         "links": object.links.reduce((acc, link) => {
             acc[link.name] = link._cid.toBaseEncodedString();
 
@@ -107,6 +115,8 @@ function parseIPFSObject(object, password = null) {
 async function expandDocumentNodeLinks(node, password = null) {
     for (let linkName in node.links) {
         let linkHash = node.links[linkName];
+
+        //@TODO: Implement key derivation
 
         let linkNode = await getDocumentNodeByHash(linkHash, password);
 
