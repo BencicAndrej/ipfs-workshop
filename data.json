@@ -1,0 +1,132 @@
+{
+  "data": {
+    "type": "Project",
+    "name": "Top Secret Project",
+    "description": "This is a top secret project that has protected access."
+  },
+  "links": {
+    "topic:product": {
+      "data": {
+        "type": "Topic",
+        "name": "Product Documentation"
+      },
+      "links": {
+        "document:overview": {
+          "data": {
+            "type": "Document",
+            "name": "Overview Document",
+            "description": "Overview contents"
+          },
+          "links": {}
+        },
+        "document:document-1": {
+          "data": {
+            "type": "Document",
+            "name": "Document 1",
+            "description": "Contents for document 1"
+          },
+          "links": {}
+        },
+        "document:document-2": {
+          "data": {
+            "type": "Document",
+            "name": "Document 2",
+            "description": "Contents for document 2"
+          },
+          "links": {
+            "comment:0": {
+              "data": {
+                "type": "Comment",
+                "name": "This looks really cool",
+                "description": "We are really interested in this part of the document"
+              },
+              "links": {}
+            },
+            "comment:1": {
+              "data": {
+                "type": "Comment",
+                "name": "My team will look into this",
+                "description": "This is something my team can really use."
+              },
+              "links": {}
+            }
+          }
+        }
+      }
+    },
+    "topic:development": {
+      "data": {
+        "type": "Topic",
+        "name": "Development Specification",
+        "description": "This is where we keep the documentation for our external development team."
+      },
+      "links": {
+        "document:overview": {
+          "data": {
+            "type": "Document",
+            "name": "Overview document",
+            "description": "Contents of the overview document"
+          },
+          "links": {}
+        },
+        "document:specification": {
+          "data": {
+            "type": "Document",
+            "name": "Project Specification",
+            "description": "Contents of the project specification"
+          },
+          "links": {}
+        },
+        "document:timeline": {
+          "data": {
+            "type": "Document",
+            "name": "Timeline",
+            "description": "This is the project timeline"
+          },
+          "links": {}
+        },
+        "document:issues": {
+          "data": {
+            "type": "Document",
+            "name": "Issues",
+            "description": "Common issues with the platform"
+          },
+          "links": {
+            "comment:0": {
+              "data": {
+                "type": "Comment",
+                "name": "Issue #1",
+                "description": "Foo does not work"
+              },
+              "links": {}
+            },
+            "comment:1": {
+              "data": {
+                "type": "Comment",
+                "name": "Issue #2",
+                "description": "Bar does not work"
+              },
+              "links": {}
+            }
+          }
+        }
+      }
+    },
+    "participant:andrej-bencic": {
+      "data": {
+        "type": "Participant",
+        "name": "Andrej Bencic",
+        "description": "Andrej is a Software Engineer working in MVPWorkshop."
+      },
+      "links": {}
+    },
+    "participant:nemanja-krstonic": {
+      "data": {
+        "type": "Participant",
+        "name": "Nemanja Krstonic",
+        "description": "Andrej is a Software Engineer working in MVPWorkshop."
+      },
+      "links": {}
+    }
+  }
+}
