@@ -25,8 +25,8 @@ async function createIPFSNode(node, password = null) {
     let obj = await ipfs.object.new();
 
     for (let link in node.links || {}) {
-        //@TODO: Implement key derivation.
-        const linkNode = await createIPFSNode(node.links[link], password);
+        const linkPassword = password ? crypto.derive(password, link) : null;
+        const linkNode = await createIPFSNode(node.links[link], linkPassword);
 
         obj = await ipfs.object.patch.addLink(obj.multihash, {
             name: link,
@@ -78,8 +78,9 @@ async function getDocumentNodeAtPath(node, path, password = null) {
             throw new Error(`link not found: ${linkName}`)
         }
 
-        //@TODO: Implement key derivation.
-        node = await getDocumentNodeByHash(linkHash, password);
+        const linkPassword = password ? crypto.derive(password, linkName) : null;
+
+        node = await getDocumentNodeByHash(linkHash, linkPassword);
     }
 
     return node;
@@ -116,11 +117,11 @@ async function expandDocumentNodeLinks(node, password = null) {
     for (let linkName in node.links) {
         let linkHash = node.links[linkName];
 
-        //@TODO: Implement key derivation
+        const linkPassword = password ? crypto.derive(password, linkName) : null;
 
-        let linkNode = await getDocumentNodeByHash(linkHash, password);
+        let linkNode = await getDocumentNodeByHash(linkHash, linkPassword);
 
-        let expandedLink = await expandDocumentNodeLinks(linkNode, password);
+        let expandedLink = await expandDocumentNodeLinks(linkNode, linkPassword);
 
         node.links[linkName] = expandedLink;
     }
