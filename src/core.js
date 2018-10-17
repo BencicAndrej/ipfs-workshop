@@ -7,6 +7,10 @@ async function putCommand(documentPath, options = {}) {
     console.log("Implement me!");
 }
 
+function parseDocument(documentPath) {
+    //@TODO: Read file and print contents.
+}
+
 async function getCommand(hash, options = {}) {
     console.log("Implement me!");
 }
